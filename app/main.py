@@ -1,24 +1,24 @@
-from urllib import request
-
 from fastapi import FastAPI
 
 from app.Schemas.CodeAnalyses import (
-    CodeAnalysisRequest,
-    CodeAnalysisResponse
+    CodeAnalysesRequest,
+    CodeAnalysesResponse
 )
+
+from app.Services.ai_analysis import AIAnalysis
+
 
 app = FastAPI()
 
-@app.get("/analyze_request" , request=CodeAnalysisRequest)
-def analyze_request():
-    print(request.code)
-    print(request.language)
+ai_analysis = AIAnalysis()
 
 
-@app.post("/analyze", response_model=CodeAnalysisResponse)
-def analyze_code(request: CodeAnalysisRequest):
-    return CodeAnalysisResponse(
-        review="Code looks readable.",
-        improvements="Add better error handling.",
-        rating=8.5
+@app.post("/analyze", response_model=CodeAnalysesResponse)
+def analyze_code(request: CodeAnalysesRequest):
+
+    result = ai_analysis.analyze_code(
+        code=request.code,
+        language=request.language
     )
+
+    return result
